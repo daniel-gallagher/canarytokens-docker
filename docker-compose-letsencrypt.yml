@@ -17,8 +17,9 @@ services:
      - frontend.env
     volumes:
     - ./uploads:/uploads/
+    - log-volume:/logs
     container_name: frontend
-    command: bash -c "rm frontend.pid; twistd -noy frontend.tac -l frontend.log --pidfile=frontend.pid"
+    command: bash -c "rm frontend.pid; twistd -noy frontend.tac --logger log.logger --pidfile=frontend.pid"
   switchboard:
     build: ./canarytokens/
     restart: always
@@ -34,31 +35,20 @@ services:
     volumes_from:
     - frontend
     container_name: switchboard
-    command: bash -c "rm switchboard.pid; twistd -noy switchboard.tac -l switchboard.log --pidfile=switchboard.pid"
+    command: bash -c "rm switchboard.pid; twistd -noy switchboard.tac --logger log.logger --pidfile=switchboard.pid"
   nginx:
     restart: always
-    build: nginx-image
+    image: thinkst/certbot-nginx
+    build: ./certbot-nginx/
     ports:
      - "80:80"
      - "443:443"
     links:
      - frontend
      - switchboard
-     - letsencrypt
     container_name: nginx
-    volumes_from:
-      - letsencrypt
-    environment:
-      - MY_DOMAIN_NAME=thinkst.com
-
-  letsencrypt:
-    image: quay.io/letsencrypt/letsencrypt:latest
-    container_name: letsencrypt
-    command:  bash -c "sleep 6 && certbot certonly --standalone -d thinkst.com --text --agree-tos --email info@thinkst.com --server https://acme-v01.api.letsencrypt.org/directory --rsa-key-size 4096 --verbose --renew-by-default --standalone-supported-challenges http-01"
-    entrypoint: ""
-    volumes:
-      - /etc/letsencrypt
-      - /var/lib/letsencrypt
-    ports:
-      - "80"
-      - "443"
+    env_file:
+     - certbot.env
+volumes:
+  log-volume:
+      
