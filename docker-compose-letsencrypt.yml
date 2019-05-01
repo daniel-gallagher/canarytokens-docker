@@ -4,7 +4,7 @@ services:
     restart: always
     image: redis
     volumes:
-    - ./data:/data/
+     - ./data:/data/
     container_name: redis
     command: redis-server --appendonly yes --protected-mode no --save 60 1
   frontend:
@@ -16,8 +16,8 @@ services:
     env_file:
      - frontend.env
     volumes:
-    - ./uploads:/uploads/
-    - ./logs:/logs
+     - ./uploads:/uploads/
+     - ./logs:/logs
     container_name: frontend
     command: bash -c "rm frontend.pid; twistd -noy frontend.tac --logger log.logger --pidfile=frontend.pid"
   switchboard:
@@ -25,27 +25,30 @@ services:
     restart: always
     image: thinkst/canarytokens
     ports:
-     - "53:53"
-     - "53:53/udp"
-     - "25:25"
+      - "53:53"
+      - "53:53/udp"
+      - "587:25"
     links:
-     - redis
+      - redis
     env_file:
-     - switchboard.env
+      - switchboard.env
     volumes_from:
-    - frontend
+      - frontend
     container_name: switchboard
     command: bash -c "rm switchboard.pid; twistd -noy switchboard.tac --logger log.logger --pidfile=switchboard.pid"
   nginx:
-    restart: always
-    image: thinkst/certbot-nginx
+    image: nginx:stable
     build: ./certbot-nginx/
+    restart: always
+    volumes:
+      - ./data/nginx:/etc/nginx
+      - ./data/certbot/conf:/etc/letsencrypt
     ports:
-     - "80:80"
-     - "443:443"
+      - "80:80"
+      - "443:443"
     links:
-     - frontend
-     - switchboard
+      - frontend
+      - switchboard
     container_name: nginx
     env_file:
-     - certbot.env
+      - certbot.env

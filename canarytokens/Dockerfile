@@ -31,7 +31,7 @@ RUN pip install --no-cache-dir htmlmin==0.1.10
 RUN pip install --no-cache-dir sendgrid==3.6.5
 RUN pip install --no-cache-dir service_identity
 
-RUN wget -O master.zip https://github.com/daniel-gallagher/canarytokens/archive/master.zip?step=1
+RUN wget -O master.zip https://github.com/thinkst/canarytokens/archive/master.zip
 RUN unzip master.zip
 RUN mv /canarytokens-master/* /srv
 RUN rm -rf /canarytokens-master

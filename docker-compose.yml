@@ -27,7 +27,7 @@ services:
     ports:
      - "53:53"
      - "53:53/udp"
-     - "25:25"
+     - "587:25"
     links:
      - redis
     env_file:
