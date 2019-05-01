@@ -13,7 +13,7 @@ if [ $STAGING != "0" ]; then staging_arg="--staging"; fi
 nginx
 sleep 5
 
-./certbot $staging_arg --nginx -d $MY_DOMAIN_NAME -d www.$MY_DOMAIN_NAME --text --agree-tos --email $EMAIL_ADDRESS -v -n
+certbot $staging_arg --nginx -d $MY_DOMAIN_NAME -d www.$MY_DOMAIN_NAME --text --agree-tos --email $EMAIL_ADDRESS -v -n
 
 nginx -s stop
 sleep 3

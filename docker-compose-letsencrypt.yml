@@ -41,7 +41,6 @@ services:
     build: ./certbot-nginx/
     restart: always
     volumes:
-      - ./data/nginx:/etc/nginx
       - ./data/certbot/conf:/etc/letsencrypt
     ports:
       - "80:80"
