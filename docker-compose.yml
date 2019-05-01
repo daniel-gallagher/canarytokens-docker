@@ -38,7 +38,7 @@ services:
     command: bash -c "rm switchboard.pid; twistd -noy switchboard.tac --logger log.logger --pidfile=switchboard.pid"
   nginx:
     restart: always
-    image: thinkst/canarytokens_nginx
+    image: nginx:stable
     build: ./nginx/
     ports:
      - "80:80"
