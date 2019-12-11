@@ -37,9 +37,9 @@ services:
     container_name: switchboard
     command: bash -c "rm switchboard.pid; twistd -noy switchboard.tac --logger log.logger --pidfile=switchboard.pid"
   nginx:
-    restart: always
     image: nginx:stable
     build: ./nginx/
+    restart: always
     ports:
       - "80:80"
     links:
