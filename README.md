@@ -39,17 +39,18 @@ $ sudo pip install -U docker-compose
 #if this breaks with PyYAML errors, install the libyaml development package
 # sudo apt-get install libyaml-dev
 ```
-* Configuration is held in the two .env files: ```switchboard.ev``` and  ```frontend.ev```. Edit these.
+* Configuration is held in the two .env files: ```switchboard.env``` and  ```frontend.env```. Edit these.
 1) Set the values for `CANARY_DOMAINS` in ```frontend.env```. These must be domains you own because you will need to add an A record to each `CANARY_DOMAINS` specified pointing the domain towards your docker's public IP.
 
 2) [NOTE: This step is only necessary if you want to use PDF tokens] Set the values for `CANARY_NXDOMAINS` in ```frontend.env```. These must be domains you own because you will need to add an NS record to each `CANARY_NXDOMAINS` specified pointing the domain towards your previously specified `CANARY_DOMAINS`.
 
-3) Uncomment 'CANARY_PUBLIC_DOMAIN' in ```switchboard.ev``` and set it to one of the domains defined for `CANARY_DOMAINS` in ```frontend.ev```(if you do not uncomment and set it, the Public IP will be used).
+3) Uncomment 'CANARY_PUBLIC_DOMAIN' in ```switchboard.env``` and set it to one of the domains defined for `CANARY_DOMAINS` in ```frontend.env```(if you do not uncomment and set it, the Public IP will be used).
 
-4) Next decide on which email provider you want to use to send alerts. If you are using Mailgun to send emails, uncomment `CANARY_MAILGUN_DOMAIN_NAME` and `CANARY_MAILGUN_API_KEY` from ```switchboard.ev``` and set the values.  If you are using Mandrill or Sendgrid instead, uncomment the appropriate API key setting and set it.
+4) Next decide on which email provider you want to use to send alerts. If you are using Mailgun to send emails, uncomment `CANARY_MAILGUN_DOMAIN_NAME` and `CANARY_MAILGUN_API_KEY` from ```switchboard.env``` and set the values.  If you are using Mandrill or Sendgrid instead, uncomment the appropriate API key setting and set it.
 
 * Here's example files for a setup that generates tokens on example1.com, example2.com and example3.com (PDFs), running on a host with public domain 'my.domain' and IP 1.1.1.1, using Mailgun Domain Name 'x.y' and API Key 'zzzzzzzzzz':
-  * frontend.ev
+
+  * frontend.env
 ```
 #These domains are used for general purpose tokens
 CANARY_DOMAINS=example1.com,example2.com
@@ -61,7 +62,7 @@ CANARY_NXDOMAINS=example3.com
 #CANARY_GOOGLE_API_KEY=
 
 ```
-  * switchboard.ev (Example using Mailgun for email)
+  * switchboard.env (Example using Mailgun for email)
 ```
 CANARY_MAILGUN_DOMAIN_NAME=x.y
 CANARY_MAILGUN_API_KEY=zzzzzzzzzz
@@ -118,14 +119,19 @@ You may follow these steps if you wish to have a public facing canarytokens site
 1) `git clone https://github.com/thinkst/canarytokens-docker.git`
 2) `cd canarytokens-docker/nginx` or if you plan on using HTTPS, `cd canarytokens-docker/certbot-nginx`
 3) `sudo htpasswd -c .htpasswd user` where `user` can be any username you would like to use.
-4) edit the appropriate `nginx.conf` and
+4) `sudo chown <user>:<user> .htpasswd` where `user` is the local linux user
+5) edit the appropriate `nginx.conf` and
 ```
 server {
-    auth_basic           "Basic Auth Restricted Canrytokens"; <---- ADD
-    auth_basic_user_file /etc/nginx/htpasswd;                 <---- ADD
+    ...
+    location ~* (/generate|/manage|/download|/history|/settings|/resources).* {
+        auth_basic           "Basic Auth Restricted Canrytokens"; <---- ADD
+        auth_basic_user_file /etc/nginx/.htpasswd;                 <---- ADD
 ```
-5) edit the appropriate `Dockerfile` and add below `COPY nginx.conf ...`
+6) edit the appropriate `Dockerfile` and add below `COPY nginx.conf ...`
 ```
-COPY htpasswd /etc/nginx/htpasswd
+COPY .htpasswd /etc/nginx/.htpasswd
 ```
-6) rebuild the images using `docker-compose build`, restart your docker containers and enjoy!
+7) rebuild the images using `docker-compose build`, restart your docker containers and enjoy!
+
+Thanks @mamisano for catching a silly issue using the above 🙏 
