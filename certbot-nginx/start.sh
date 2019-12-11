@@ -7,10 +7,10 @@ echo  "----------------------------------------------------------------"
 
 sed -i "s/___my.example.com___/$MY_DOMAIN_NAME/g" /etc/nginx/nginx.conf
 
-openssl x509 -in /etc/letsencrypt/live/$MY_DOMAIN_NAME/cert.pem -checkend 604800 > /dev/null 2>&1
-
 # Enable staging mode if needed
 if [ $STAGING != "0" ]; then staging_arg="--staging"; fi
+
+openssl x509 -in /etc/letsencrypt/live/$MY_DOMAIN_NAME/cert.pem -checkend 604800 > /dev/null 2>&1
 
 if [ $? -eq 0 ]; then
   echo "Certificate is already present and won't expire in the next week, skipping renewal"
