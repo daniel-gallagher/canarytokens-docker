@@ -4,7 +4,7 @@ services:
     restart: always
     image: redis
     volumes:
-     - ./data:/data/
+      - ./data:/data/
     container_name: redis
     command: redis-server --appendonly yes --protected-mode no --save 60 1
   frontend:
@@ -12,12 +12,12 @@ services:
     build: ./canarytokens/
     image: thinkst/canarytokens
     links:
-     - redis
+      - redis
     env_file:
-     - frontend.env
+      - frontend.env
     volumes:
-     - ./uploads:/uploads/
-     - ./logs:/logs
+      - ./uploads:/uploads/
+      - ./logs:/logs
     container_name: frontend
     command: bash -c "rm frontend.pid; twistd -noy frontend.tac --logger log.logger --pidfile=frontend.pid"
   switchboard:

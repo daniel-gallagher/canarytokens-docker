@@ -4,7 +4,7 @@ services:
     restart: always
     image: redis
     volumes:
-    - ./data:/data/
+      - ./data:/data/
     container_name: redis
     command: redis-server --appendonly yes --protected-mode no --save 60 1
   frontend:
@@ -12,12 +12,12 @@ services:
     build: ./canarytokens/
     image: thinkst/canarytokens
     links:
-     - redis
+      - redis
     env_file:
-     - frontend.env
+      - frontend.env
     volumes:
-    - ./uploads:/uploads/
-    - ./logs:/logs
+      - ./uploads:/uploads/
+      - ./logs:/logs
     container_name: frontend
     command: bash -c "rm frontend.pid; twistd -noy frontend.tac --logger log.logger --pidfile=frontend.pid"
   switchboard:
@@ -25,15 +25,15 @@ services:
     restart: always
     image: thinkst/canarytokens
     ports:
-     - "53:53"
-     - "53:53/udp"
-     - "587:25"
+      - "53:53"
+      - "53:53/udp"
+      - "587:25"
     links:
-     - redis
+      - redis
     env_file:
-     - switchboard.env
+      - switchboard.env
     volumes_from:
-    - frontend
+      - frontend
     container_name: switchboard
     command: bash -c "rm switchboard.pid; twistd -noy switchboard.tac --logger log.logger --pidfile=switchboard.pid"
   nginx:
@@ -41,9 +41,9 @@ services:
     image: nginx:stable
     build: ./nginx/
     ports:
-     - "80:80"
+      - "80:80"
     links:
-     - frontend
-     - switchboard
+      - frontend
+      - switchboard
     container_name: nginx
     command: /usr/sbin/nginx -c /etc/nginx/nginx.conf -g "daemon off;"
